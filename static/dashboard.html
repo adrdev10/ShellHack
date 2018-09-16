@@ -39,10 +39,10 @@
                 <div id="map" style="width:100%;height:400px;"></div>
             </div>
             <div class="text-center mt-3 p-3 text-muted font-weight-bold border">
-                {{ member }} person(s) who have clicked a restaurant 
+                {{ member }} person(s) 
                 <hr>
                 <li class="m-auto text-success" v-for="member in connectedMembers">
-                    {{ member }} / member who are now live connected 
+                    {{ member }}
                 </li>
             </div>
             <div class="border invisible h-50 w-75 text-center" ref="added" style="font-size: 2rem; position: absolute; right: 0; background: #48cbe0">{{ addedMember }} just started watching.</div>
@@ -82,7 +82,8 @@
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
-                    }
+                }
+
                 }).then(function(res){ return res.json(); })
                     .then(function(data){ 
                         if(data != 'false'){
@@ -128,15 +129,10 @@
                      that.connectedMembers.push(member.id)
                      });
                  });
-     
+
                  // ----------------------------------------------------
                  // Display a notification when a new member comes online
                  // ----------------------------------------------------
-
-                 channel.bind('clickedBanner', function(data) {
-                    that.clickEvent++;
-                    
-                 })
 
                  channel.bind('pusher:member_added', function(data) {
                      that.member++;
@@ -264,7 +260,7 @@
                                             map: map,
                                         });
                                         marker.addListener("click", function() {
-                                            console.log("User clicked once");
+                                            
                                         })
                                     }
                                 }
