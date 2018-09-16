@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 
 	pusher "github.com/pusher/pusher-http-go"
+	"github.com/urfave/negroni"
 )
 
 // Here, we register the Pusher client
@@ -50,14 +50,23 @@ type Restaurant struct {
 }
 
 type Rest struct {
-	Name         string             `json:"name"`
-	LocationRest LocationRestaurant `json:"location"`
+	Name          string             `json:"name"`
+	LocationRest  LocationRestaurant `json:"location"`
+	Cuisine       string             `json:"cuisines"`
+	AvgCostforTwo int                `json:"average_cost_for_two"`
+	UserRating    UserRating         `json:"user_rating"`
 }
 
 type LocationRestaurant struct {
 	Lat          string `json:"latitude"`
 	Long         string `json:"longitude"`
 	CuiseneLocal string `json:"locality_verbose"`
+}
+
+type UserRating struct {
+	Rating     string `json:"aggregate_rating"`
+	RatingText string `json:"rating_text"`
+	Votes      string `json:"votes"`
 }
 
 var value int
@@ -87,17 +96,13 @@ func isUserLoggedIn(rw http.ResponseWriter, req *http.Request) {
 // -------------------------------------------------------
 func NewUser(rw http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
-
 	if err != nil {
 		panic(err)
 	}
-
 	err = json.Unmarshal(body, &loggedInUser)
-
 	if err != nil {
 		panic(err)
 	}
-
 	json.NewEncoder(rw).Encode(loggedInUser)
 }
 
@@ -125,20 +130,20 @@ func pusherAuth(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-
+	newMux := http.NewServeMux()
 	// Serve the static files and templates from the static directory
-	http.Handle("/", http.FileServer(http.Dir("./static")))
+	newMux.Handle("/", http.FileServer(http.Dir("./static")))
 
 	// Here, we determine if a user is logged in or not.
-	http.HandleFunc("/isLoggedIn", isUserLoggedIn)
+	newMux.HandleFunc("/isLoggedIn", isUserLoggedIn)
 
 	// -------------------------------------------------------
 	// Listen on these routes for new user registration and user authorization,
 	// thereafter, handle each request using the matching handler function.
 	// -------------------------------------------------------
-	http.HandleFunc("/new/user", NewUser)
-	http.HandleFunc("/pusher/auth", pusherAuth)
-	http.HandleFunc("/search/food", func(w http.ResponseWriter, r *http.Request) {
+	newMux.HandleFunc("/new/user", NewUser)
+	newMux.HandleFunc("/pusher/auth", pusherAuth)
+	newMux.HandleFunc("/search/food", func(w http.ResponseWriter, r *http.Request) {
 		var res *http.Response
 		if r.Method == "GET" {
 			city := r.FormValue("city")
@@ -184,7 +189,7 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/search/food/rest", func(w http.ResponseWriter, r *http.Request) {
+	newMux.HandleFunc("/search/food/rest", func(w http.ResponseWriter, r *http.Request) {
 		var res *http.Response
 		var err error
 		fmt.Println(value)
@@ -231,7 +236,7 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
+	newMux.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
 		var res *http.Response
 		var err error
 		req, err := http.NewRequest(http.MethodGet, "https://developers.zomato.com/api/v2.1/cuisines?city_id=280", nil)
@@ -274,6 +279,9 @@ func main() {
 		}
 	})
 
+	n := negroni.Classic() // Includes some default middlewares
+	n.UseHandler(newMux)
+
 	// Start executing the application on port 8090
-	log.Fatal(http.ListenAndServe(":8090", nil))
+	n.Run(":8080")
 }
