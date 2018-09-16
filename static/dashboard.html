@@ -12,11 +12,8 @@
                 width:100%;
             }
     
-            .container{
-                margin:0;
-                padding:0;
-                width:100%;
-                margin-bottom:5%;
+            .fluid-container{
+                margin-bottom:1%;
             }
     
             .navbar-nav{
@@ -28,93 +25,83 @@
             .username{
                 margin:0;
                 padding:0;
+                text-align:center;
             }
 
-            stars-outer {
-                display: inline-block;
-                position: relative;
-                font-family: FontAwesome;
-                }
-                
-                .stars-outer::before {
-                content: "\f006 \f006 \f006 \f006 \f006";
-                }
-                
-                .stars-inner {
-                position: absolute;
-                top: 0;
-                left: 0;
-                white-space: nowrap;
-                overflow: hidden;
-                width: 0;
-                }
-                
-                .stars-inner::before {
-                content: "\f005 \f005 \f005 \f005 \f005";
-                color: #f8ce0b;
+            .restaurantDataView{
+                width:100%;
+                height:100%;
+                text-align:center;
             }
+            
+            .restaurantDataView div{
+                padding:5px;
+            }
+
+            .restaurantDataView p, h2{
+                margin:0;
+            }
+
+            form{
+                width:100%;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .hidden{
+                display:none;
+            }
+
         </style>
       </head>
 
   <body>
         <div id="app">
-            <div>
-                <div class="container navbar-expand-lg navbar-light bg-light">
-                    <div class="navbar-nav">
-                        <h1 class="nav-item nav-link left">Live Meeters and Eaters</h1>
-                        <div class="right">
-                            <img src="user.png"  height="50px" width="50px" class="rounded-circle border nav-item nav-link"/>
-                            <p class="nav-item nav-link username"> {{ username }} </p>
-                        </div>
+            <div class="fluid-container navbar-expand-lg navbar-light bg-light">
+                <div class="navbar-nav">
+                    <h1 class="nav-item nav-link left">LIVE MEETERS AND EATERS</h1>
+                    <div class="right">
+                        <img src="user.png"  height="50px" width="50px" class="rounded-circle border nav-item nav-link"/>
+                        <p class="nav-item nav-link username"> {{ username }} </p>
                     </div>
                 </div>
-    
-                <div>
-                    <div class="restaurantSearch">
-                        <form class="form-inline" action="js/scripts.js" onsubmit="return false">
-                            <div class="row">
-                                <div class="col-auto">
-                                    <input type="text" class="form-control" placeholder="City" name="city" id="culture">
-                                </div>
-                                <div class="col-auto">
-                                    <input type="text" class="form-control" placeholder="Cuisine" name="cuisine" id="cuisine">
-                                </div>
-                                <div class="col-auto">
-                                    <input type="submit" onclick="getRest()" value="Search" class="btn btn-success mb-2"/>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-            <div id="map-view" class="frame-map">
-                <div id="map" style="width:50%;height:400px;"></div>
             </div>
-            <div class="restaurantDataView">
-                    <div>
-                           
-                    </div>
+
+            <div>
+                <div class="restaurantSearch">
+                    <form class="form-inline" action="js/scripts.js" onsubmit="return false">
+                        <div class="row">
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="City" name="city" id="culture">
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="Cuisine" name="cuisine" id="cuisine">
+                            </div>
+                            <div class="col-auto">
+                                <input type="submit" onclick="getRest()" value="Search" class="btn btn-success mb-2"/>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            <div class="text-center mt-3 p-3 text-muted font-weight-bold border">
-                {{ member }} person
+            </div>
+                {{ member }} person(s) who have clicked a restaurant 
                 <hr>
                 <li class="m-auto text-success" v-for="member in connectedMembers">
-                    {{ member }}
-                </li>
+                    {{ member }} / member who are now live connected 
+            </li>
             </div>
             <div class="border invisible h-50 w-75 text-center" ref="added" style="font-size: 2rem; position: absolute; right: 0; background: #48cbe0">{{ addedMember }} just started watching.</div>
             <div class="border invisible h-50 w-75 text-center" ref="removed" style="font-size: 2rem; position: absolute; right: 0; background: #ff8325">{{ removedMember }} just stopped watching.</div>
             <!-- <div id="bottom-sec">
                 <ul id="rest-list"></ul>
             </div> -->
-        </div>
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://js.pusher.com/4.2/pusher.min.js"></script>
     <script>
         var app = new Vue({
                 el: '#app',
-     
                 data: {
                     username: '',
                     member: 0,
@@ -254,6 +241,7 @@
                 var map = $("#map")
                 map.hide()
             });
+
             var map, infoWindow;
         
             function initMap() {
@@ -274,7 +262,6 @@
                             map: map,
                         });
 
-                        marker.addListener('click', function() {
                             $.ajax({
                                 url: "/search/food/rest",
                                 method: "POST",
@@ -308,7 +295,8 @@
                                         var lat = obj.restaurant.location.latitude
                                         var lon = obj.restaurant.location.longitude
                                         var name = obj.restaurant.name
-                                    
+                                        var rating = obj.restaurant.user_rating.aggregate_rating;
+                                        var avgCost = obj.restaurant.average_cost_for_two;
                                         var el = "<ul><li><p>" + name + "</p>" + "<p>" + obj.restaurant.location.locality_verbose + "</p><li><a>Join Restaurant</a></li></ul>"                                      
                                         list.append(el)
                                         var myLatLng = {lat: parseFloat(lat), lng: parseFloat(lon)};
@@ -320,24 +308,20 @@
                                             labelClass: "labels",
                                             icon: image
                                         });
-                                        marker.addListener("click", function() {
-                                            console.log("User clicked " + name);
-                                            
-
-                                        })
+                                        var restData = "<div><h3>" + name + "</h3><p>" + obj.restaurant.location.locality_verbose + "</p><p>" + rating + " / 5</p><p>Average Cost For Two: " + avgCost + "</p><button type='button' class='btn btn-success'>Join</button></div>";
+                                        addClickHandler(marker, restData);
                                     }
                                 }
                             })
-                        });
-                        infoWindow = new google.maps.InfoWindow;
-                        infoWindow.setPosition(pos);
-                        infoWindow.open(map);
-                        map.setCenter(pos);
-                        map.setZoom(25);
-                        var marker = new google.maps.Marker({
-                            position: pos,
-                            map: map,
-                        });
+                        // infoWindow = new google.maps.InfoWindow;
+                        // infoWindow.setPosition(pos);
+                        // infoWindow.open(map);
+                        // map.setCenter(pos);
+                        // map.setZoom(25);
+                        // var marker = new google.maps.Marker({
+                        //     position: pos,
+                        //     map: map,
+                        // });
                     }, function() {
                         handleLocationError(true, infoWindow, map.getCenter());
                     });
@@ -345,6 +329,17 @@
                     // Browser doesn't support Geolocation
                     handleLocationError(false, infoWindow, map.getCenter());
                 }
+            }
+
+            function addClickHandler(theMarker, restData) {
+                google.maps.event.addListener(theMarker, 'click', function() {
+                    $(".restaurantDataView").html("");
+                    $(".restaurantDataView").append(restData);
+                    var lobby = $(".lobby");
+                    if(lobby.hasClass("hidden")){
+                        lobby.removeClass("hidden");
+                    }
+                });
             }
         
             function handleLocationError(browserHasGeolocation, infoWindow, pos) {
