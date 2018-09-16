@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <!--title icon-->
         <link rel="icon" href="_">
-        <title>Live Meeters and Eaters | Dashboard </title>
+        <title>Live Meeters and Eaters </title>
         <style>
             .app{
                 width:100%;
@@ -59,10 +59,10 @@
         <div id="app">
             <div class="fluid-container navbar-expand-lg navbar-light bg-light">
                 <div class="navbar-nav">
-                    <h1 class="nav-item nav-link left">LIVE MEETERS AND EATERS</h1>
+                    <h1 class="nav-item left">LIVE MEETERS AND EATERS</h1>
                     <div class="right">
-                        <img src="user.png"  height="50px" width="50px" class="rounded-circle border nav-item nav-link"/>
-                        <p class="nav-item nav-link username"> {{ username }} </p>
+                        <img src="user.png"  height="50px" width="50px" class="rounded-circle border nav-item"/>
+                        <p class="nav-item username"> {{ username }} </p>
                     </div>
                 </div>
             </div>
@@ -226,9 +226,10 @@
                      }, 3000)
      
                  });
-                 }
+            }
            }
          })
+
         var id;
             function getRest() {
                 
@@ -325,7 +326,7 @@
                                             labelClass: "labels",
                                             icon: image
                                         });
-                                        var restData = "<div><h3>" + name + "</h3><p>" + obj.restaurant.location.locality_verbose + "</p><p>" + rating + " / 5</p><p>Average Cost For Two: " + avgCost + "</p><button type='button' class='btn btn-success'>Join</button></div>";
+                                        var restData = "<div><h3>" + name + "</h3><p>" + obj.restaurant.location.locality_verbose + "</p><p>" + rating + " / 5</p><p>Average Cost For Two: " + avgCost + "</p><button type='button' onclick='joinParty()' class='btn btn-success'>Join</button></div>";
                                         addClickHandler(marker, restData);
                                     }
                                 }
@@ -359,6 +360,13 @@
                 });
             }
         
+            function joinParty(){
+                $('body').html("");
+
+               $('body').append("<div class='alert alert-success'><strong>Success!</strong> You have joined the party! You will receive an email shortly.</div>");
+               $('body').append("<a href='dashboard.html'>Go Back</a>")
+            }
+
             function handleLocationError(browserHasGeolocation, infoWindow, pos) {
                 infoWindow.setPosition(pos);
                 infoWindow.setContent(browserHasGeolocation ?
