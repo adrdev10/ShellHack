@@ -6,7 +6,7 @@
         <meta name="description" content="A food meetup application.">
         <meta name="author" content="NDaJuan, Adrian, Genesis">
         <link rel="icon" href="">
-
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <title>Live Meeters and Eaters</title>
 
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -118,9 +118,7 @@
                 }
               }
         </style>
-
       </head>
-
 
       <body>
           <div id="app">
@@ -129,27 +127,20 @@
                   <h1 class="h3 mb-3 font-weight-normal">LIVE EATERS AND MEETERS</h1>
                   <p>Meet others and enjoy the cuisine of your choice.</p>
                 </div>
-
             <div class="form-label-group">
                 <input type="name" id="inputUsername" ref="username" class="form-control" placeholder="Username" required="" autofocus="">
                   <label for="inputUsername">Username</label>
               </div>
-
             <div class="form-label-group">
               <input type="email" id="inputEmail" ref="email" class="form-control" placeholder="Email address" autofocus="" required>
                 <label for="inputEmail">Email address</label>
             </div>
-
             <button class="btn btn-lg btn-success btn-block" type="submit" @click.prevent="login">Enter</button>
-            <!-- <p class="mt-5 mb-3 text-muted text-center">© 2017-2018</p> -->
           </form>
-
           </div>
-
+          
           <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-
           <script>
-
              var app = new Vue({
              el: '#app',
 
