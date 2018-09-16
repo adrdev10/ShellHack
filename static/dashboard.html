@@ -196,17 +196,19 @@
                     
                  })
 
-                 channel.bind('pusher:member_added', function(data) {
-                     that.member++;
-                     that.connectedMembers.push(data.id)
-                     that.addedMember = data.id
-     
-                     setTimeout(function() {
+                 channel.bind('pusher:member_added', data => {
+                    that.member++
+                    that.connectedMembers.push(data.id)
+                    that.addedMember = data.id
+
+                    that.$refs.added.classList.add('visible')
+                    that.$refs.added.classList.remove('invisible')
+
+                    window.setTimeout(() => {
                         that.$refs.added.classList.remove('visible');
                         that.$refs.added.classList.add('invisible');
-                     }, 3000)
-     
-                 });
+                    }, 3000)
+                });
      
                  // ----------------------------------------------------
                  // Display a notification when a member goes offline
