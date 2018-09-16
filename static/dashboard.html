@@ -103,8 +103,8 @@
                     {{ member }} / member who are now live connected 
             </li>
             </div>
-            <div class="border invisible h-50 w-75 text-center" ref="added" style="font-size: 2rem; position: absolute; right: 0; background: #48cbe0">{{ addedMember }} just started watching.</div>
-            <div class="border invisible h-50 w-75 text-center" ref="removed" style="font-size: 2rem; position: absolute; right: 0; background: #ff8325">{{ removedMember }} just stopped watching.</div>
+            <div class="border invisible h-50 w-75 text-center startWatching hidden" ref="added" style="font-size: 2rem; position: absolute; right: 0; background: #48cbe0">{{ addedMember }} just started watching.</div>
+            <div class="border invisible h-50 w-75 text-center stopWatching hidden" ref="removed" style="font-size: 2rem; position: absolute; right: 0; background: #ff8325">{{ removedMember }} just stopped watching.</div>
             <!-- <div id="bottom-sec">
                 <ul id="rest-list"></ul>
             </div> -->
@@ -196,15 +196,13 @@
                     
                  })
 
-                 channel.bind('pusher:member_added', data => {
-                    that.member++
-                    that.connectedMembers.push(data.id)
-                    that.addedMember = data.id
-
-                    that.$refs.added.classList.add('visible')
-                    that.$refs.added.classList.remove('invisible')
-
-                    window.setTimeout(() => {
+                 channel.bind('pusher:member_added', function(data) {
+                     that.member++;
+                     that.connectedMembers.push(data.id)
+                     that.addedMember = data.id
+                     that.$refs.added.classList.remove('visible');
+                    that.$refs.added.classList.add('invisible');
+                     setTimeout(function() {
                         that.$refs.added.classList.remove('visible');
                         that.$refs.added.classList.add('invisible');
                     }, 3000)
@@ -364,7 +362,6 @@
         
             function joinParty(){
                 $('body').html("");
-
                $('body').append("<div class='alert alert-success'><strong>Success!</strong> You have joined the party! You will receive an email shortly.</div>");
                $('body').append("<a href='dashboard.html'>Go Back</a>")
             }
