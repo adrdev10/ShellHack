@@ -92,15 +92,7 @@
             </div>
             <div class="restaurantDataView">
                     <div>
-                            <div class="stars-outer">
-                                    <div class="stars-inner">
-                                        <i class="fa fa-star-o" aria-hidden="true"></i>
-                                        <i class="fa fa-star-o" aria-hidden="true"></i>
-                                        <i class="fa fa-star-o" aria-hidden="true"></i>
-                                        <i class="fa fa-star-o" aria-hidden="true"></i>
-                                        <i class="fa fa-star-o" aria-hidden="true"></i>
-                                    </div>
-                            </div>
+                           
                     </div>
                 </div>
             <div class="text-center mt-3 p-3 text-muted font-weight-bold border">
@@ -254,6 +246,7 @@
             }
         
             (function($) {
+                document.cookie = "clicks=0";
             // Asynchronously Load the map API 
                 var script = document.createElement('script');
                 script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ21fG3QxD0RyeUr5C44C4nD-7kcPc9M4&callback=initMap";
@@ -315,6 +308,7 @@
                                         var lat = obj.restaurant.location.latitude
                                         var lon = obj.restaurant.location.longitude
                                         var name = obj.restaurant.name
+                                    
                                         var el = "<ul><li><p>" + name + "</p>" + "<p>" + obj.restaurant.location.locality_verbose + "</p><li><a>Join Restaurant</a></li></ul>"                                      
                                         list.append(el)
                                         var myLatLng = {lat: parseFloat(lat), lng: parseFloat(lon)};
@@ -328,6 +322,8 @@
                                         });
                                         marker.addListener("click", function() {
                                             console.log("User clicked " + name);
+                                            
+
                                         })
                                     }
                                 }
