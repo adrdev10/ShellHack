@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="icon" href="https://www.onlinelogomaker.com/blog/wp-content/uploads/2017/07/Fotolia_117855281_Subscription_Monthly_M.jpg">
+    <title>Byte For All | Dashboard </title>
+
+  </head>
+
+  <body>
+    <div id="app">
+        <div class="container-red">
+            <div class="col-3 float-right">
+                <img src="https://www.seoclerk.com/pics/319222-1IvI0s1421931178.png"  height="72px" width="72px" class="rounded-circle border"/>
+                <p class="mr-auto mt-3 d-inline"> {{ username }} </p>
+            </div>
+            <div>
+                <h1>Bytes For All</h1>
+                <div class="restaurantSearch">
+                    <form class="form-inline" action="js/scripts.js" onsubmit="return false">
+                        <div class="row">
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="City" name="city" id="culture">
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="Zip Code" name="zipCode" id="code">
+                            </div>
+                            <div class="col-auto">
+                                <input type="submit" onclick="getRest()"  class="btn btn-primary mb-2"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="map-view" class="frame-map">
+                <div id="map" style="width:100%;height:400px;"></div>
+            </div>
+            <div class="text-center mt-3 p-3 text-muted font-weight-bold border">
+                {{ member }} person(s) who have clicked a restaurant 
+                <hr>
+                <li class="m-auto text-success" v-for="member in connectedMembers">
+                    {{ member }} / member who are now live connected 
+                </li>
+            </div>
+            <div class="border invisible h-50 w-75 text-center" ref="added" style="font-size: 2rem; position: absolute; right: 0; background: #48cbe0">{{ addedMember }} just started watching.</div>
+            <div class="border invisible h-50 w-75 text-center" ref="removed" style="font-size: 2rem; position: absolute; right: 0; background: #ff8325">{{ removedMember }} just stopped watching.</div>
+            <div id="bottom-sec">
+                <ul id="rest-list"></ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://js.pusher.com/4.2/pusher.min.js"></script>
+    <script>
+        var app = new Vue({
+                el: '#app',
+     
+                data: {
+                    username: '',
+                    member: 0,
+                    addedMember: '',
+                    removedMember: '',
+                    connectedMembers: [],
+                    clickEvent: 0
+                },
+     
+                created: function(){
+     
+                 // ----------------------------------------------------
+                 // Retain reference to the Vue context object
+                 // ----------------------------------------------------
+                 let that = this;
+     
+                 // -------------------------------------------------------------------------
+                 // Verify that a user is logged in, if not, send the user to the login page
+                 // -------------------------------------------------------------------------
+                fetch('/isLoggedIn', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function(res){ return res.json(); })
+                    .then(function(data){ 
+                        if(data != 'false'){
+                            that.username = data.username;
+                        }else{
+                            window.location.replace( "/" );
+                    }
+                });
+     
+                 // ------------------------------------------------------------------------------------------------
+                 // Invoke the subscribe method to subscribe to a new presence channel and display updates accordingly
+                 // -------------------------------------------------------------------------------------------------
+                 this.subscribe()
+            },
+     
+            methods: {
+             subscribe: function(){
+                 // ----------------------------------------------------
+                 // Retain reference to the Vue context object
+                 // ----------------------------------------------------
+                 let that = this
+     
+                 // ----------------------------------------------------
+                 // Configure Pusher instance
+                 // ----------------------------------------------------
+                 const pusher = new Pusher('1791bdb1a90b21e2e8ac', {
+                       authEndpoint: '/pusher/auth',
+                       cluster: 'us2',
+                       encrypted: true
+                 }); 
+     
+                 // ----------------------------------------------------
+                 // Subscribe to the presence channel
+                 // ----------------------------------------------------
+                 let channel = pusher.subscribe('presence-channel');
+     
+                 // ----------------------------------------------------
+                 // Update the number of online members on successful subscription
+                 // ----------------------------------------------------
+                 channel.bind('pusher:subscription_succeeded', function(data){
+                     that.member = data.count
+                     data.each(function(member) {
+                     that.connectedMembers.push(member.id)
+                     });
+                 });
+     
+                 // ----------------------------------------------------
+                 // Display a notification when a new member comes online
+                 // ----------------------------------------------------
+
+                 channel.bind('clickedBanner', function(data) {
+                    that.clickEvent++;
+                 })
+
+                 channel.bind('pusher:member_added', function(data) {
+                     that.member++;
+                     that.connectedMembers.push(data.id)
+                     that.addedMember = data.id
+     
+                     setTimeout(function() {
+                        that.$refs.added.classList.remove('visible');
+                        that.$refs.added.classList.add('invisible');
+                     }, 3000)
+     
+                 });
+     
+                 // ----------------------------------------------------
+                 // Display a notification when a member goes offline
+                 // ----------------------------------------------------
+                 channel.bind('pusher:member_removed', function(data) {
+                     that.member--;
+                     var index = that.connectedMembers.indexOf(data.id);
+                     if (index > -1) { that.connectedMembers.splice(index, 1) }
+                     that.removedMember = data.id
+     
+                     that.$refs.removed.classList.add('visible');
+                     that.$refs.removed.classList.remove('invisible');
+     
+                     setTimeout(function() {
+                        that.$refs.removed.classList.remove('visible');
+                        that.$refs.removed.classList.add('invisible');
+                     }, 3000)
+     
+                 });
+                 }
+           }
+         })
+        var id;
+            function getRest() {
+                
+                $.ajax({
+                    url: "/search/food",
+                    method: "GET",
+                    data: $(".form-inline").serialize(),
+                    success: function(data) {
+                        var d = JSON.parse(data);
+                        if (!d) return;
+                        console.log(d);
+                        for(var i = 0; i < d.length; i++) {
+                            var obj = d[i];
+                            id = obj.entity_id
+                            console.log(id);
+                        }
+                    }
+                })
+                return false
+            }
+        
+            (function($) {
+            // Asynchronously Load the map API 
+                var script = document.createElement('script');
+                script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ21fG3QxD0RyeUr5C44C4nD-7kcPc9M4&callback=initMap";
+                document.body.appendChild(script);
+                var map = $("#map")
+                map.hide()
+            });
+            var map, infoWindow;
+        
+            function initMap() {
+                //HTML5 geolocation.
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var location = new google.maps.LatLng({
+                            lat: position.coords.latitude, 
+                            lng: position.coords.longitude
+                        }); 
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            center: location,
+                            zoom: 13
+                        });
+                    
+                        var marker = new google.maps.Marker({
+                            position: location,
+                            map: map,
+                        });
+
+                        marker.addListener('click', function() {
+                            $.ajax({
+                                url: "/search/food/rest",
+                                method: "POST",
+                                success: function(data) {
+                                    console.log(id);
+                                    var dataJ = JSON.parse(data)
+                                    if (!dataJ) return;
+                                    console.log(dataJ);
+                                    // Origins, anchor positions and coordinates of the marker increase in the X
+                                    // direction to the right and in the Y direction down.
+                                    var image = {
+                                        url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
+                                        // This marker is 20 pixels wide by 32 pixels high.
+                                        size: new google.maps.Size(20, 32),
+                                        // The origin for this image is (0, 0).
+                                        origin: new google.maps.Point(0, 0),
+                                        // The anchor for this image is the base of the flagpole at (0, 32).
+                                        anchor: new google.maps.Point(0, 32)
+                                    };
+                                    // Shapes define the clickable region of the icon. The type defines an HTML
+                                    // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+                                    // The final coordinate closes the poly by connecting to the first coordinate.
+                                    var shape = {
+                                        coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                                        type: 'poly'
+                                    };
+                                    var list = $("#rest-list");
+                                    for(var i = 0; i < dataJ.length; i++) {
+                                        var obj = dataJ[i];
+                                        console.log(obj.restaurant);
+                                        var lat = obj.restaurant.location.latitude
+                                        var lon = obj.restaurant.location.longitude
+                                        var name = obj.restaurant.name
+                                        var el = "<ul><li><p>" + name + "</p>" + "<p>" + obj.restaurant.location.locality_verbose + "</p><li><a>Join Restaurant</a></li></ul>"                                      
+                                        list.append(el)
+                                        var myLatLng = {lat: parseFloat(lat), lng: parseFloat(lon)};
+                                        var marker = new google.maps.Marker({
+                                            position: myLatLng,
+                                            icon: image,
+                                            shape: shape,
+                                            map: map,
+                                        });
+                                        marker.addListener("click", function() {
+                                            console.log("User clicked once");
+                                        })
+                                    }
+                                }
+                            })
+                        });
+                        infoWindow = new google.maps.InfoWindow;
+                        infoWindow.setPosition(pos);
+                        infoWindow.open(map);
+                        map.setCenter(pos);
+                        map.setZoom(25);
+                        var marker = new google.maps.Marker({
+                            position: pos,
+                            map: map,
+                        });
+                    }, function() {
+                        handleLocationError(true, infoWindow, map.getCenter());
+                    });
+                } else {
+                    // Browser doesn't support Geolocation
+                    handleLocationError(false, infoWindow, map.getCenter());
+                }
+            }
+        
+            function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+                infoWindow.setPosition(pos);
+                infoWindow.setContent(browserHasGeolocation ?
+                                        'Error: The Geolocation service failed.' :
+                                        'Error: Your browser doesn\'t support geolocation.');
+                infoWindow.open(map);
+            }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ21fG3QxD0RyeUr5C44C4nD-7kcPc9M4&callback=initMap"
+    async defer></script>
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.js"
+    integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://js.pusher.com/4.2/pusher.min.js"></script>
+</body>
+
+</html>
