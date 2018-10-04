@@ -319,5 +319,5 @@ func main() {
 	n.UseHandler(newMux)
 
 	// Start executing the application on port 8090
-	n.Run(":", port)
+	http.ListenAndServe(":"+port, n)
 }
