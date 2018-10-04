@@ -84,6 +84,18 @@
                     </form>
                 </div>
             </div>
+            <div class="section">
+                <!--MAP-->
+                <div id="map-view" class="frame-map">
+                    <div id="map" style="width:100%;height:400px;"></div>
+                </div>
+
+                <!--RESTAURANT DATA-->
+                <div class="restaurantDataView">
+
+                </div>
+            </div>
+            <div class="text-center mt-3 p-3 text-muted font-weight-bold border lobby hidden">
                 {{ member }} person(s) who have clicked a restaurant 
                 <hr>
                 <li class="m-auto text-success" v-for="member in connectedMembers">
@@ -230,7 +242,44 @@
                         }
                     }
                 })
+<<<<<<< HEAD
+                return false
+            }
+        
+            (function($) {
+                document.cookie = "clicks=0";
+            // Asynchronously Load the map API 
+                var script = document.createElement('script');
+                script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ21fG3QxD0RyeUr5C44C4nD-7kcPc9M4&callback=initMap";
+                document.body.appendChild(script);
+                var map = $("#map")
+                map.hide()
+            });
+
+            var map, infoWindow;
+        
+            function initMap() {
+                //HTML5 geolocation.
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var location = new google.maps.LatLng({
+                            lat: position.coords.latitude, 
+                            lng: position.coords.longitude
+                        }); 
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            center: location,
+                            zoom: 13
+                        });
+                    
+                        var marker = new google.maps.Marker({
+                            position: location,
+                            map: map,
+                        });
+
+                            $.ajax({
+=======
                 $.ajax({
+>>>>>>> genesis
                                 url: "/search/food/rest",
                                 method: "POST",
                                 success: function(data) {
