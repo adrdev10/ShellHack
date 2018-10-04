@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <!--title icon-->
         <link rel="icon" href="_">
-        <title>Live Meeters and Eaters | Dashboard </title>
+        <title>Live Meeters and Eaters </title>
         <style>
             .app{
                 width:100%;
@@ -59,10 +59,10 @@
         <div id="app">
             <div class="fluid-container navbar-expand-lg navbar-light bg-light">
                 <div class="navbar-nav">
-                    <h1 class="nav-item nav-link left">LIVE MEETERS AND EATERS</h1>
+                    <h1 class="nav-item left">LIVE MEETERS AND EATERS</h1>
                     <div class="right">
-                        <img src="user.png"  height="50px" width="50px" class="rounded-circle border nav-item nav-link"/>
-                        <p class="nav-item nav-link username"> {{ username }} </p>
+                        <img src="user.png"  height="50px" width="50px" class="rounded-circle border nav-item"/>
+                        <p class="nav-item username"> {{ username }} </p>
                     </div>
                 </div>
             </div>
@@ -90,8 +90,8 @@
                     {{ member }} / member who are now live connected 
             </li>
             </div>
-            <div class="border invisible h-50 w-75 text-center" ref="added" style="font-size: 2rem; position: absolute; right: 0; background: #48cbe0">{{ addedMember }} just started watching.</div>
-            <div class="border invisible h-50 w-75 text-center" ref="removed" style="font-size: 2rem; position: absolute; right: 0; background: #ff8325">{{ removedMember }} just stopped watching.</div>
+            <div class="border invisible h-50 w-75 text-center startWatching hidden" ref="added" style="font-size: 2rem; position: absolute; right: 0; background: #48cbe0">{{ addedMember }} just started watching.</div>
+            <div class="border invisible h-50 w-75 text-center stopWatching hidden" ref="removed" style="font-size: 2rem; position: absolute; right: 0; background: #ff8325">{{ removedMember }} just stopped watching.</div>
             <!-- <div id="bottom-sec">
                 <ul id="rest-list"></ul>
             </div> -->
@@ -182,13 +182,13 @@
                      that.member++;
                      that.connectedMembers.push(data.id)
                      that.addedMember = data.id
-     
+                     that.$refs.added.classList.remove('visible');
+                    that.$refs.added.classList.add('invisible');
                      setTimeout(function() {
                         that.$refs.added.classList.remove('visible');
                         that.$refs.added.classList.add('invisible');
-                     }, 3000)
-     
-                 });
+                    }, 3000)
+                });
      
                  // ----------------------------------------------------
                  // Display a notification when a member goes offline
@@ -208,9 +208,10 @@
                      }, 3000)
      
                  });
-                 }
+            }
            }
          })
+
         var id;
             function getRest() {
                 
@@ -229,6 +230,7 @@
                         }
                     }
                 })
+<<<<<<< HEAD
                 return false
             }
         
@@ -263,6 +265,9 @@
                         });
 
                             $.ajax({
+=======
+                $.ajax({
+>>>>>>> genesis
                                 url: "/search/food/rest",
                                 method: "POST",
                                 success: function(data) {
@@ -308,11 +313,42 @@
                                             labelClass: "labels",
                                             icon: image
                                         });
-                                        var restData = "<div><h3>" + name + "</h3><p>" + obj.restaurant.location.locality_verbose + "</p><p>" + rating + " / 5</p><p>Average Cost For Two: " + avgCost + "</p><button type='button' class='btn btn-success'>Join</button></div>";
+                                        var restData = "<div><h3>" + name + "</h3><p>" + obj.restaurant.location.locality_verbose + "</p><p>" + rating + " / 5</p><p>Average Cost For Two: " + avgCost + "</p><button type='button' onclick='joinParty()' class='btn btn-success'>Join</button></div>";
                                         addClickHandler(marker, restData);
                                     }
                                 }
                             })
+                return false
+            }
+        
+            (function($) {
+            // Asynchronously Load the map API 
+                var script = document.createElement('script');
+                script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ21fG3QxD0RyeUr5C44C4nD-7kcPc9M4&callback=initMap";
+                document.body.appendChild(script);
+                var map = $("#map")
+                map.hide()
+            });
+
+            var map, infoWindow;
+        
+            function initMap() {
+                //HTML5 geolocation.
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var location = new google.maps.LatLng({
+                            lat: position.coords.latitude, 
+                            lng: position.coords.longitude
+                        }); 
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            center: location,
+                            zoom: 13
+                        });
+                    
+                        var marker = new google.maps.Marker({
+                            position: location,
+                            map: map,
+                        });
                         // infoWindow = new google.maps.InfoWindow;
                         // infoWindow.setPosition(pos);
                         // infoWindow.open(map);
@@ -331,6 +367,17 @@
                 }
             }
 
+            // function sendSMS() {
+            //     $.ajax({
+            //         url: "/success/send",
+            //         method: "GET",
+            //         success: function() {
+            //             console.log("Congrats");
+            //         }
+                    
+            //     })
+            // }
+
             function addClickHandler(theMarker, restData) {
                 google.maps.event.addListener(theMarker, 'click', function() {
                     $(".restaurantDataView").html("");
@@ -342,6 +389,14 @@
                 });
             }
         
+            function joinParty(){
+                $('body').html("");
+               $('body').append("<div class='alert alert-success'><strong>Success!</strong> You have joined the party! You will receive an email shortly.</div>");
+               $('body').append("<a href='dashboard.html'>Go Back</a>")
+
+                sendSMS()
+            }
+
             function handleLocationError(browserHasGeolocation, infoWindow, pos) {
                 infoWindow.setPosition(pos);
                 infoWindow.setContent(browserHasGeolocation ?
