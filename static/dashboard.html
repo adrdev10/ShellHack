@@ -243,56 +243,56 @@
                     }
                 })
                 $.ajax({
-                                url: "/search/food/rest",
-                                method: "POST",
-                                success: function(data) {
-                                    console.log(id);
-                                    var dataJ = JSON.parse(data)
-                                    if (!dataJ) return;
-                                    console.log(dataJ);
-                                    // Origins, anchor positions and coordinates of the marker increase in the X
-                                    // direction to the right and in the Y direction down.
-                                    var image = {
-                                        url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
-                                        // This marker is 20 pixels wide by 32 pixels high.
-                                        size: new google.maps.Size(20, 32),
-                                        // The origin for this image is (0, 0).
-                                        origin: new google.maps.Point(0, 0),
-                                        // The anchor for this image is the base of the flagpole at (0, 32).
-                                        anchor: new google.maps.Point(0, 32)
-                                    };
-                                    // Shapes define the clickable region of the icon. The type defines an HTML
-                                    // <area> element 'poly' which traces out a polygon as a series of X,Y points.
-                                    // The final coordinate closes the poly by connecting to the first coordinate.
-                                    var shape = {
-                                        coords: [1, 1, 1, 20, 18, 20, 18, 1],
-                                        type: 'poly'
-                                    };
-                                    var list = $("#rest-list");
-                                    for(var i = 0; i < dataJ.length; i++) {
-                                        var obj = dataJ[i];
-                                        console.log(obj.restaurant);
-                                        var lat = obj.restaurant.location.latitude
-                                        var lon = obj.restaurant.location.longitude
-                                        var name = obj.restaurant.name
-                                        var rating = obj.restaurant.user_rating.aggregate_rating;
-                                        var avgCost = obj.restaurant.average_cost_for_two;
-                                        var el = "<ul><li><p>" + name + "</p>" + "<p>" + obj.restaurant.location.locality_verbose + "</p><li><a>Join Restaurant</a></li></ul>"                                      
-                                        list.append(el)
-                                        var myLatLng = {lat: parseFloat(lat), lng: parseFloat(lon)};
-                                        var marker = new google.maps.Marker({
-                                            position: myLatLng,
-                                            shape: shape,
-                                            map: map,
-                                            label:obj.restaurant.name,
-                                            labelClass: "labels",
-                                            icon: image
-                                        });
-                                        var restData = "<div><h3>" + name + "</h3><p>" + obj.restaurant.location.locality_verbose + "</p><p>" + rating + " / 5</p><p>Average Cost For Two: " + avgCost + "</p><button type='button' onclick='joinParty()' class='btn btn-success'>Join</button></div>";
-                                        addClickHandler(marker, restData);
-                                    }
-                                }
-                            })
+                    url: "/search/food/rest",
+                    method: "POST",
+                    success: function(data) {
+                        console.log(id);
+                        var dataJ = JSON.parse(data)
+                        if (!dataJ) return;
+                        console.log(dataJ);
+                        // Origins, anchor positions and coordinates of the marker increase in the X
+                        // direction to the right and in the Y direction down.
+                        var image = {
+                            url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
+                            // This marker is 20 pixels wide by 32 pixels high.
+                            size: new google.maps.Size(20, 32),
+                            // The origin for this image is (0, 0).
+                            origin: new google.maps.Point(0, 0),
+                            // The anchor for this image is the base of the flagpole at (0, 32).
+                            anchor: new google.maps.Point(0, 32)
+                        };
+                        // Shapes define the clickable region of the icon. The type defines an HTML
+                        // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+                        // The final coordinate closes the poly by connecting to the first coordinate.
+                        var shape = {
+                            coords: [1, 1, 1, 20, 18, 20, 18, 1],
+                            type: 'poly'
+                        };
+                        var list = $("#rest-list");
+                        for(var i = 0; i < dataJ.length; i++) {
+                            var obj = dataJ[i];
+                            console.log(obj.restaurant);
+                            var lat = obj.restaurant.location.latitude
+                            var lon = obj.restaurant.location.longitude
+                            var name = obj.restaurant.name
+                            var rating = obj.restaurant.user_rating.aggregate_rating;
+                            var avgCost = obj.restaurant.average_cost_for_two;
+                            var el = "<ul><li><p>" + name + "</p>" + "<p>" + obj.restaurant.location.locality_verbose + "</p><li><a>Join Restaurant</a></li></ul>"                                      
+                            list.append(el)
+                            var myLatLng = {lat: parseFloat(lat), lng: parseFloat(lon)};
+                            var marker = new google.maps.Marker({
+                                position: myLatLng,
+                                shape: shape,
+                                map: map,
+                                label:obj.restaurant.name,
+                                labelClass: "labels",
+                                icon: image
+                            });
+                            var restData = "<div><h3>" + name + "</h3><p>" + obj.restaurant.location.locality_verbose + "</p><p>" + rating + " / 5</p><p>Average Cost For Two: " + avgCost + "</p><button type='button' onclick='joinParty()' class='btn btn-success'>Join</button></div>";
+                            addClickHandler(marker, restData);
+                        }
+                    }
+                })
                 return false
             }
         
