@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	pusher "github.com/pusher/pusher-http-go"
 	"github.com/urfave/negroni"
@@ -73,8 +74,9 @@ var value int
 
 // Here, we define a user struct
 type user struct {
-	Username string `json:"username" xml:"username" form:"username" query:"username"`
-	Email    string `json:"email" xml:"email" form:"email" query:"email"`
+	Username    string `json:"username" xml:"username" form:"username" query:"username"`
+	Email       string `json:"email" xml:"email" form:"email" query:"email"`
+	PhoneNumber string `json:"phonenumber"`
 }
 
 // Here, we create a global user variable to hold user details for a session
@@ -129,6 +131,38 @@ func pusherAuth(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(res, string(response))
 }
 
+func createEmail(r http.ResponseWriter, w *http.Request) {
+	var accountSid = "AC47589820a42731a6c3c4b00e4dc942f9"
+	var AuthToken = "89806f248c7bfbd65a655a1b25fb6c31"
+	var urlStr = "https://api.twilio.com/2010-04-01/Accounts/"
+
+	strConv := fmt.Sprintf("Welcome %s, Your have chosen the perfect restaurant with the perfect person/s. Soon you will get to set the address and time. Thank You", loggedInUser.Username)
+
+	msgData := url.Values{}
+	msgData.Set("To", "+18135855228")
+	msgData.Set("From", "+18505338424")
+	msgData.Set("Body", strConv)
+	msgDataReader := *strings.NewReader(msgData.Encode())
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", urlStr, &msgDataReader)
+	req.SetBasicAuth(accountSid, AuthToken)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, _ := client.Do(req)
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		var data map[string]interface{}
+		decoder := json.NewDecoder(resp.Body)
+		err := decoder.Decode(&data)
+		if err == nil {
+			fmt.Println(data["sid"])
+		}
+	} else {
+		fmt.Println(resp.Status)
+	}
+}
+
 func main() {
 	newMux := http.NewServeMux()
 	// Serve the static files and templates from the static directory
@@ -142,6 +176,7 @@ func main() {
 	// thereafter, handle each request using the matching handler function.
 	// -------------------------------------------------------
 	newMux.HandleFunc("/new/user", NewUser)
+	newMux.HandleFunc("/success/send", createEmail)
 	newMux.HandleFunc("/pusher/auth", pusherAuth)
 	newMux.HandleFunc("/search/food", func(w http.ResponseWriter, r *http.Request) {
 		var res *http.Response

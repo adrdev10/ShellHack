@@ -248,39 +248,7 @@
                         }
                     }
                 })
-                return false
-            }
-        
-            (function($) {
-            // Asynchronously Load the map API 
-                var script = document.createElement('script');
-                script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ21fG3QxD0RyeUr5C44C4nD-7kcPc9M4&callback=initMap";
-                document.body.appendChild(script);
-                var map = $("#map")
-                map.hide()
-            });
-
-            var map, infoWindow;
-        
-            function initMap() {
-                //HTML5 geolocation.
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        var location = new google.maps.LatLng({
-                            lat: position.coords.latitude, 
-                            lng: position.coords.longitude
-                        }); 
-                        map = new google.maps.Map(document.getElementById('map'), {
-                            center: location,
-                            zoom: 13
-                        });
-                    
-                        var marker = new google.maps.Marker({
-                            position: location,
-                            map: map,
-                        });
-
-                            $.ajax({
+                $.ajax({
                                 url: "/search/food/rest",
                                 method: "POST",
                                 success: function(data) {
@@ -331,6 +299,37 @@
                                     }
                                 }
                             })
+                return false
+            }
+        
+            (function($) {
+            // Asynchronously Load the map API 
+                var script = document.createElement('script');
+                script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ21fG3QxD0RyeUr5C44C4nD-7kcPc9M4&callback=initMap";
+                document.body.appendChild(script);
+                var map = $("#map")
+                map.hide()
+            });
+
+            var map, infoWindow;
+        
+            function initMap() {
+                //HTML5 geolocation.
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        var location = new google.maps.LatLng({
+                            lat: position.coords.latitude, 
+                            lng: position.coords.longitude
+                        }); 
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            center: location,
+                            zoom: 13
+                        });
+                    
+                        var marker = new google.maps.Marker({
+                            position: location,
+                            map: map,
+                        });
                         // infoWindow = new google.maps.InfoWindow;
                         // infoWindow.setPosition(pos);
                         // infoWindow.open(map);
@@ -349,6 +348,17 @@
                 }
             }
 
+            // function sendSMS() {
+            //     $.ajax({
+            //         url: "/success/send",
+            //         method: "GET",
+            //         success: function() {
+            //             console.log("Congrats");
+            //         }
+                    
+            //     })
+            // }
+
             function addClickHandler(theMarker, restData) {
                 google.maps.event.addListener(theMarker, 'click', function() {
                     $(".restaurantDataView").html("");
@@ -364,6 +374,8 @@
                 $('body').html("");
                $('body').append("<div class='alert alert-success'><strong>Success!</strong> You have joined the party! You will receive an email shortly.</div>");
                $('body').append("<a href='dashboard.html'>Go Back</a>")
+
+                sendSMS()
             }
 
             function handleLocationError(browserHasGeolocation, infoWindow, pos) {
