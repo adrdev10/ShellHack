@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	pusher "github.com/pusher/pusher-http-go"
@@ -164,6 +165,7 @@ func createEmail(r http.ResponseWriter, w *http.Request) {
 }
 
 func main() {
+	port := os.Getenv("PORT")
 	newMux := http.NewServeMux()
 	// Serve the static files and templates from the static directory
 	newMux.Handle("/", http.FileServer(http.Dir("./static")))
@@ -313,10 +315,9 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
-
 	n := negroni.Classic() // Includes some default middlewares
 	n.UseHandler(newMux)
 
 	// Start executing the application on port 8090
-	n.Run(":8080")
+	n.Run(":", port)
 }
