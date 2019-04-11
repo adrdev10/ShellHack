@@ -14,83 +14,12 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// Here, we register the Pusher client
-var client = pusher.Client{
-	AppId:   "600556",
-	Key:     "1791bdb1a90b21e2e8ac",
-	Secret:  "9c55dc8ac436be5be3db",
-	Cluster: "us2",
-	Secure:  true,
-}
 
-type Cuisines struct {
-	Cuisines []Cui `json:"cuisines"`
-}
-type Cui struct {
-	Cuisine Cuisine `json:"cuisine"`
-}
-type Cuisine struct {
-	Cuisine_id   int    `json:"cuisine_id"`
-	Cuisine_name string `json:"cuisine_name"`
-}
-
-type Location struct {
-	LocationData []Data `json:"location_suggestions"`
-}
-
-type Data struct {
-	EntityName string `json:"entity_type"`
-	EntityId   int    `json:"entity_id"`
-}
-
-type Restaurants struct {
-	Restaurant []Restaurant `json:"restaurants"`
-}
-
-type Restaurant struct {
-	Rest Rest `json:"restaurant"`
-}
-
-type Rest struct {
-	Name          string             `json:"name"`
-	LocationRest  LocationRestaurant `json:"location"`
-	Cuisine       string             `json:"cuisines"`
-	AvgCostforTwo int                `json:"average_cost_for_two"`
-	UserRating    UserRating         `json:"user_rating"`
-}
-
-type LocationRestaurant struct {
-	Lat          string `json:"latitude"`
-	Long         string `json:"longitude"`
-	CuiseneLocal string `json:"locality_verbose"`
-}
-
-type UserRating struct {
-	Rating     string `json:"aggregate_rating"`
-	RatingText string `json:"rating_text"`
-	Votes      string `json:"votes"`
-}
 
 var value int
 
-// Here, we define a user struct
-type user struct {
-	Username    string `json:"username" xml:"username" form:"username" query:"username"`
-	Email       string `json:"email" xml:"email" form:"email" query:"email"`
-	PhoneNumber string `json:"phonenumber"`
-}
-
 // Here, we create a global user variable to hold user details for a session
 var loggedInUser user
-
-// Here, we check if a user is logged in
-func isUserLoggedIn(rw http.ResponseWriter, req *http.Request) {
-	if loggedInUser.Username != "" && loggedInUser.Email != "" {
-		json.NewEncoder(rw).Encode(loggedInUser)
-	} else {
-		json.NewEncoder(rw).Encode("false")
-	}
-}
 
 // -------------------------------------------------------
 // Here, we receive a new user's details in a POST request and
